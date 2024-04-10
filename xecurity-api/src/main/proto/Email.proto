@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package com.goncharov.grpc;
+
+message EmailRequest{
+  string email = 1;
+
+}
+
+message EmailResponse{
+  string link = 1;
+}
+
+service ConfirmationService{
+  rpc confirm(EmailRequest) returns (EmailResponse);
+}
