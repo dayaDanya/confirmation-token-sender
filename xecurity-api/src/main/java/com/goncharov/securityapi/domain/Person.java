@@ -37,5 +37,7 @@ public class Person {
      */
     private Role role;
 
+    private boolean isEnabled;
+
 
 }

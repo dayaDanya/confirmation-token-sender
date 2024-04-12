@@ -19,8 +19,6 @@ import java.util.List;
 public class PersonDetails implements UserDetails {
     private Person person;
 
-
-
     @Override
     public String getPassword() {
         return person.getPassword();
@@ -48,7 +46,7 @@ public class PersonDetails implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return true;
+        return person.isEnabled();
     }
 
     @Override
