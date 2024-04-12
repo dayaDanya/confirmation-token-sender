@@ -1,5 +1,7 @@
 package com.goncharov.securityapi.controllers;
 
+import com.goncharov.grpc.Email;
+import com.goncharov.grpc.SendMessageServiceGrpc;
 import com.goncharov.securityapi.domain.ConfirmationToken;
 import com.goncharov.securityapi.security.dto.AuthenticationRequest;
 import com.goncharov.securityapi.security.dto.AuthenticationResponse;
@@ -7,6 +9,7 @@ import com.goncharov.securityapi.security.dto.RegisterRequest;
 import com.goncharov.securityapi.services.AuthenticationService;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
+import jakarta.annotation.PostConstruct;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -20,12 +23,21 @@ import org.springframework.web.bind.annotation.RestController;
 public class SecurityController {
     private final AuthenticationService service;
 
+    private final ManagedChannel managedChannel;
+
+    private SendMessageServiceGrpc.SendMessageServiceBlockingStub stub;
+
+    @PostConstruct
+    private void initializeStub() {
+        stub = SendMessageServiceGrpc.newBlockingStub(managedChannel);
+    }
     @PostMapping("/register")
     public ResponseEntity<AuthenticationResponse> register(
             @Valid
             @RequestBody RegisterRequest request) {
         try {
-            ConfirmationToken token = service.register(request);
+            var emailRequest = service.register(request);
+            stub.sendMessage(emailRequest);
             return ResponseEntity.ok(new AuthenticationResponse("Please check your email to confirmate the registration"));
         }catch (RuntimeException e){
             return ResponseEntity

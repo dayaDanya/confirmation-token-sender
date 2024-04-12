@@ -1,5 +1,6 @@
 package com.goncharov.securityapi.services;
 
+import com.goncharov.grpc.Email;
 import com.goncharov.securityapi.domain.ConfirmationToken;
 import com.goncharov.securityapi.domain.Person;
 import com.goncharov.securityapi.domain.enums.Role;
@@ -27,7 +28,7 @@ public class AuthenticationService {
 
     private final ConfirmationTokenService confirmationTokenService;
 
-    public AuthenticationResponse confirmRegistration(String confirmationToken){
+    public AuthenticationResponse confirmRegistration(String confirmationToken) {
         Person person = confirmationTokenService.findPersonByToken(confirmationToken);
         person.setRole(Role.USER);
         person.setEnabled(true);
@@ -39,8 +40,8 @@ public class AuthenticationService {
         return new AuthenticationResponse(jwtToken);
     }
 
-    public ConfirmationToken register(RegisterRequest request) {
-        if(repository.findByEmail(request.getEmail()).isPresent()){
+    public Email.EmailRequest register(RegisterRequest request) {
+        if (repository.findByEmail(request.getEmail()).isPresent()) {
             throw new EmailNotUniqueException(request.getEmail());
         }
         var person = Person.builder()
@@ -52,7 +53,11 @@ public class AuthenticationService {
                 .build();
         repository.save(person);
         var confirmationToken = confirmationTokenService.generateToken(person);
-        return confirmationToken;
+        return Email.EmailRequest.newBuilder()
+                .setEmail(person.getEmail())
+                .setToken(confirmationToken.getToken())
+                .build();
+
     }
 
     public AuthenticationResponse authenticate(AuthenticationRequest request) {
