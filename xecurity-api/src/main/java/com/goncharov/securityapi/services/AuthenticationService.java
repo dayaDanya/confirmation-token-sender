@@ -1,5 +1,6 @@
 package com.goncharov.securityapi.services;
 
+import com.goncharov.securityapi.domain.ConfirmationToken;
 import com.goncharov.securityapi.domain.Person;
 import com.goncharov.securityapi.domain.enums.Role;
 import com.goncharov.securityapi.exceptions.EmailNotUniqueException;
@@ -24,24 +25,34 @@ public class AuthenticationService {
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
 
+    private final ConfirmationTokenService confirmationTokenService;
 
-    public AuthenticationResponse register(@Valid RegisterRequest request) {
+    public AuthenticationResponse confirmRegistration(String confirmationToken){
+        Person person = confirmationTokenService.findPersonByToken(confirmationToken);
+        person.setRole(Role.USER);
+        person.setEnabled(true);
+        var userDetails =
+                PersonDetails.builder()
+                        .person(person)
+                        .build();
+        var jwtToken = jwtService.generateToken(userDetails);
+        return new AuthenticationResponse(jwtToken);
+    }
+
+    public ConfirmationToken register(@Valid RegisterRequest request) {
         if(repository.findByEmail(request.getEmail()).isPresent()){
             throw new EmailNotUniqueException(request.getEmail());
         }
-        var userDetails =
-                PersonDetails.builder()
-                        .person(Person.builder()
-                                .username(request.getUsername())
-                                .email(request.getEmail())
-                                .password(passwordEncoder.encode(request.getPassword()))
-                                .role(Role.USER)
-                                .isEnabled(false)
-                                .build())
-                        .build();
-        repository.save(userDetails.getPerson());
-        var jwtToken = jwtService.generateToken(userDetails);
-        return new AuthenticationResponse(jwtToken);
+        var person = Person.builder()
+                .username(request.getUsername())
+                .email(request.getEmail())
+                .password(passwordEncoder.encode(request.getPassword()))
+                .role(Role.USER)
+                .isEnabled(false)
+                .build();
+        repository.save(person);
+        var confirmationToken = confirmationTokenService.generateToken(person.getEmail());
+        return confirmationToken;
     }
 
     public AuthenticationResponse authenticate(AuthenticationRequest request) {
