@@ -24,9 +24,14 @@ public class SecurityController {
     public ResponseEntity<AuthenticationResponse> register(
             @Valid
             @RequestBody RegisterRequest request) {
-        ConfirmationToken token = service.register(request);
-        return ResponseEntity.ok(new AuthenticationResponse("Please check your email to confirmate the registration"));
-
+        try {
+            ConfirmationToken token = service.register(request);
+            return ResponseEntity.ok(new AuthenticationResponse("Please check your email to confirmate the registration"));
+        }catch (RuntimeException e){
+            return ResponseEntity
+                    .badRequest()
+                    .body(new AuthenticationResponse(e.getMessage()));
+        }
     }
 
     @PostMapping("/authenticate")

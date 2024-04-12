@@ -39,7 +39,7 @@ public class AuthenticationService {
         return new AuthenticationResponse(jwtToken);
     }
 
-    public ConfirmationToken register(@Valid RegisterRequest request) {
+    public ConfirmationToken register(RegisterRequest request) {
         if(repository.findByEmail(request.getEmail()).isPresent()){
             throw new EmailNotUniqueException(request.getEmail());
         }
