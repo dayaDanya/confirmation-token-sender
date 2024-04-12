@@ -51,7 +51,7 @@ public class AuthenticationService {
                 .isEnabled(false)
                 .build();
         repository.save(person);
-        var confirmationToken = confirmationTokenService.generateToken(person.getEmail());
+        var confirmationToken = confirmationTokenService.generateToken(person);
         return confirmationToken;
     }
 

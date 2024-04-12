@@ -6,6 +6,10 @@ import com.goncharov.securityapi.repos.ConfirmationTokenRepo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.Calendar;
+import java.util.Date;
+import java.util.UUID;
+
 @Service
 @RequiredArgsConstructor
 public class ConfirmationTokenService {
@@ -16,7 +20,16 @@ public class ConfirmationTokenService {
         return confirmationTokenRepo.findPersonByToken(token).orElseThrow();
     }
 
-    public ConfirmationToken generateToken(String email) {
-        //todo
+    public ConfirmationToken generateToken(Person person) {
+        return ConfirmationToken.builder()
+                .token(UUID.randomUUID().toString())
+                .expiredAt(getExpiryDate())
+                .person(person)
+                .build();
+    }
+    public Date getExpiryDate(){
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.DAY_OF_YEAR, 1);
+        return calendar.getTime();
     }
 }

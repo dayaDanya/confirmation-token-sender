@@ -1,5 +1,6 @@
 package com.goncharov.securityapi.controllers;
 
+import com.goncharov.securityapi.domain.ConfirmationToken;
 import com.goncharov.securityapi.security.dto.AuthenticationRequest;
 import com.goncharov.securityapi.security.dto.AuthenticationResponse;
 import com.goncharov.securityapi.security.dto.RegisterRequest;
@@ -23,8 +24,8 @@ public class SecurityController {
     public ResponseEntity<AuthenticationResponse> register(
             @Valid
             @RequestBody RegisterRequest request) {
-        AuthenticationResponse response = service.register(request);
-        return ResponseEntity.ok(response);
+        ConfirmationToken token = service.register(request);
+        return ResponseEntity.ok(new AuthenticationResponse("Please check your email to confirmate the registration"));
 
     }
 
