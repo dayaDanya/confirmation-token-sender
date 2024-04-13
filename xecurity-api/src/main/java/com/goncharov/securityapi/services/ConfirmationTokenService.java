@@ -17,7 +17,8 @@ public class ConfirmationTokenService {
 
     public Person findPersonByToken(String token){
         //todo add ex
-        return confirmationTokenRepo.findPersonByToken(token).orElseThrow();
+        return confirmationTokenRepo.findPersonByToken(token).orElseThrow(() ->
+                new RuntimeException("Confirmation token isn't actual"));
     }
 
     public ConfirmationToken generateToken(Person person) {

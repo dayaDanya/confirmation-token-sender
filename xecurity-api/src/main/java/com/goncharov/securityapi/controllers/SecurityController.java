@@ -16,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -31,22 +32,27 @@ public class SecurityController {
     private void initializeStub() {
         stub = SendMessageServiceGrpc.newBlockingStub(managedChannel);
     }
-    @PostMapping("/register")
+    @PostMapping("/registration")
     public ResponseEntity<AuthenticationResponse> register(
             @Valid
             @RequestBody RegisterRequest request) {
         try {
             var emailRequest = service.register(request);
             stub.sendMessage(emailRequest);
-            return ResponseEntity.ok(new AuthenticationResponse("Please check your email to confirmate the registration"));
+            return ResponseEntity.ok(new AuthenticationResponse("Please check your email to confirm the registration"));
         }catch (RuntimeException e){
             return ResponseEntity
                     .badRequest()
                     .body(new AuthenticationResponse(e.getMessage()));
         }
     }
+    @PostMapping("/confirmation")
+    public ResponseEntity<AuthenticationResponse> confirmReg(
+            @RequestParam("token") String confirmationToken){
+        return ResponseEntity.ok(service.confirmRegistration(confirmationToken));
+    }
 
-    @PostMapping("/authenticate")
+    @PostMapping("/auth")
     public ResponseEntity<AuthenticationResponse> authenticate(
             @Valid
             @RequestBody AuthenticationRequest request

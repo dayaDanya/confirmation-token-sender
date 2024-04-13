@@ -1,7 +1,6 @@
 package com.goncharov.securityapi.services;
 
 import com.goncharov.grpc.Email;
-import com.goncharov.securityapi.domain.ConfirmationToken;
 import com.goncharov.securityapi.domain.Person;
 import com.goncharov.securityapi.domain.enums.Role;
 import com.goncharov.securityapi.exceptions.EmailNotUniqueException;
@@ -11,7 +10,6 @@ import com.goncharov.securityapi.security.auth.PersonDetails;
 import com.goncharov.securityapi.security.dto.AuthenticationRequest;
 import com.goncharov.securityapi.security.dto.AuthenticationResponse;
 import com.goncharov.securityapi.security.dto.RegisterRequest;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -29,15 +27,19 @@ public class AuthenticationService {
     private final ConfirmationTokenService confirmationTokenService;
 
     public AuthenticationResponse confirmRegistration(String confirmationToken) {
-        Person person = confirmationTokenService.findPersonByToken(confirmationToken);
-        person.setRole(Role.USER);
-        person.setEnabled(true);
-        var userDetails =
-                PersonDetails.builder()
-                        .person(person)
-                        .build();
-        var jwtToken = jwtService.generateToken(userDetails);
-        return new AuthenticationResponse(jwtToken);
+        try {
+            Person person = confirmationTokenService.findPersonByToken(confirmationToken);
+            person.setRole(Role.USER);
+            person.setEnabled(true);
+            var userDetails =
+                    PersonDetails.builder()
+                            .person(person)
+                            .build();
+            var jwtToken = jwtService.generateToken(userDetails);
+            return new AuthenticationResponse(jwtToken);
+        } catch (RuntimeException e){
+            return new AuthenticationResponse(e.getMessage());
+        }
     }
 
     public Email.EmailRequest register(RegisterRequest request) {
