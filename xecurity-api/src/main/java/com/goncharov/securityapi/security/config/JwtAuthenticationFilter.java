@@ -1,5 +1,6 @@
 package com.goncharov.securityapi.security.config;
 
+import com.goncharov.securityapi.services.JwtService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

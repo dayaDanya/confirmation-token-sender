@@ -19,24 +19,30 @@ public class Person {
     /**
      * id пользователя
      */
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private long id;
-    /**
-     * имя пользователя
-     */
-    private String username;
+
     /**
      * электронная почта
      */
+    @Column(name = "email", nullable = false)
     private String email;
     /**
      * пароль
      */
+    @Column(name = "password", nullable = false)
     private String password;
     /**
      * Роль
      */
+    @Column(name = "role")
     private Role role;
-
+    /**
+     * Активирован
+     */
+    @Column(name = "is_enabled")
     private boolean isEnabled;
 
 

@@ -7,6 +7,7 @@ import com.goncharov.securityapi.security.dto.AuthenticationRequest;
 import com.goncharov.securityapi.security.dto.AuthenticationResponse;
 import com.goncharov.securityapi.security.dto.RegisterRequest;
 import com.goncharov.securityapi.services.AuthenticationService;
+import com.goncharov.securityapi.services.SendMessageServiceImpl;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import jakarta.annotation.PostConstruct;
@@ -28,6 +29,8 @@ public class SecurityController {
 
     private SendMessageServiceGrpc.SendMessageServiceBlockingStub stub;
 
+    private final SendMessageServiceImpl mesServ;
+
     @PostConstruct
     private void initializeStub() {
         stub = SendMessageServiceGrpc.newBlockingStub(managedChannel);
@@ -38,8 +41,10 @@ public class SecurityController {
             @RequestBody RegisterRequest request) {
         try {
             var emailRequest = service.register(request);
-            stub.sendMessage(emailRequest);
-            return ResponseEntity.ok(new AuthenticationResponse("Please check your email to confirm the registration"));
+
+            mesServ.sendMessage(mesServ.createMessage(emailRequest.getEmail(), emailRequest.getToken()));
+          //  var response = stub.sendMessage(emailRequest);
+            return ResponseEntity.ok(new AuthenticationResponse("check email"));//response.getMessage()));
         }catch (RuntimeException e){
             return ResponseEntity
                     .badRequest()

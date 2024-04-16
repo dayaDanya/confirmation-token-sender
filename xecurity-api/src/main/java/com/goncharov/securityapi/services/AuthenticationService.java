@@ -47,7 +47,6 @@ public class AuthenticationService {
             throw new EmailNotUniqueException(request.getEmail());
         }
         var person = Person.builder()
-                .username(request.getUsername())
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .role(Role.USER)

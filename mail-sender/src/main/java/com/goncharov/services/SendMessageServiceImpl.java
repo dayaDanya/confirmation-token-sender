@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class SendMessageServiceImpl
         extends SendMessageServiceGrpc.SendMessageServiceImplBase {
-    private JavaMailSender javaMailSender;
+    private final JavaMailSender javaMailSender;
 
     @Autowired
     public SendMessageServiceImpl(JavaMailSender javaMailSender) {
@@ -28,9 +28,10 @@ public class SendMessageServiceImpl
         SimpleMailMessage mailMessage = new SimpleMailMessage();
         mailMessage.setTo(email);
         mailMessage.setSubject("Complete Registration!");
-        mailMessage.setFrom("company@gmail.com");
+        mailMessage.setFrom("singlearity1@gmail.com");
         mailMessage.setText("To confirm your account, please click here : "
                 + "http://localhost:8080/confirmation?token=" + token);
+        System.out.println(mailMessage.toString());
         return mailMessage;
     }
 
@@ -45,6 +46,7 @@ public class SendMessageServiceImpl
             responseObserver.onNext(response);
             responseObserver.onCompleted();
         } catch (MailException e){
+            e.printStackTrace();
             var response = Email.EmailResponse.newBuilder()
                     .setMessage(e.getMessage())
                     .build();
