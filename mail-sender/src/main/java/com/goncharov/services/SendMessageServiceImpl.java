@@ -3,16 +3,15 @@ package com.goncharov.services;
 import com.goncharov.grpc.Email;
 import com.goncharov.grpc.SendMessageServiceGrpc;
 import io.grpc.stub.StreamObserver;
+import net.devh.boot.grpc.server.service.GrpcService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.MailException;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.scheduling.annotation.Async;
-import org.springframework.stereotype.Service;
 
-@Service
-public class SendMessageServiceImpl
-        extends SendMessageServiceGrpc.SendMessageServiceImplBase {
+@GrpcService
+public class SendMessageServiceImpl extends SendMessageServiceGrpc.SendMessageServiceImplBase {
     private final JavaMailSender javaMailSender;
 
     @Autowired
@@ -28,14 +27,13 @@ public class SendMessageServiceImpl
         SimpleMailMessage mailMessage = new SimpleMailMessage();
         mailMessage.setTo(email);
         mailMessage.setSubject("Complete Registration!");
-        mailMessage.setFrom("singlearity1@gmail.com");
+        mailMessage.setFrom("danyagoncharov99@yandex.ru");
         mailMessage.setText("To confirm your account, please click here : "
                 + "http://localhost:8080/confirmation?token=" + token);
         System.out.println(mailMessage.toString());
         return mailMessage;
     }
 
-    @Async
     @Override
     public void sendMessage(Email.EmailRequest request, StreamObserver<Email.EmailResponse> responseObserver) {
         try {

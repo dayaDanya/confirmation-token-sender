@@ -42,9 +42,9 @@ public class SecurityController {
         try {
             var emailRequest = service.register(request);
 
-            mesServ.sendMessage(mesServ.createMessage(emailRequest.getEmail(), emailRequest.getToken()));
-          //  var response = stub.sendMessage(emailRequest);
-            return ResponseEntity.ok(new AuthenticationResponse("check email"));//response.getMessage()));
+            //mesServ.sendMessage(mesServ.createMessage(emailRequest.getEmail(), emailRequest.getToken()));
+            var response = stub.sendMessage(emailRequest);
+            return ResponseEntity.ok(new AuthenticationResponse(response.getMessage()));//response.getMessage()));
         }catch (RuntimeException e){
             return ResponseEntity
                     .badRequest()
