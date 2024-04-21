@@ -28,7 +28,8 @@ public class AuthenticationService {
 
     public AuthenticationResponse confirmRegistration(String confirmationToken) {
         try {
-            Person person = confirmationTokenService.findPersonByToken(confirmationToken);
+            Person person = confirmationTokenService.findPersonByToken(confirmationToken)
+                    .orElseThrow(() -> new RuntimeException("Token is not actual!"));
             person.setRole(Role.USER);
             person.setEnabled(true);
             var userDetails =

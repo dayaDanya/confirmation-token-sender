@@ -1,24 +1,16 @@
 package com.goncharov.securityapi.controllers;
 
-import com.goncharov.grpc.Email;
 import com.goncharov.grpc.SendMessageServiceGrpc;
-import com.goncharov.securityapi.domain.ConfirmationToken;
 import com.goncharov.securityapi.security.dto.AuthenticationRequest;
 import com.goncharov.securityapi.security.dto.AuthenticationResponse;
 import com.goncharov.securityapi.security.dto.RegisterRequest;
 import com.goncharov.securityapi.services.AuthenticationService;
-import com.goncharov.securityapi.services.SendMessageServiceImpl;
 import io.grpc.ManagedChannel;
-import io.grpc.ManagedChannelBuilder;
 import jakarta.annotation.PostConstruct;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -29,7 +21,6 @@ public class SecurityController {
 
     private SendMessageServiceGrpc.SendMessageServiceBlockingStub stub;
 
-    private final SendMessageServiceImpl mesServ;
 
     @PostConstruct
     private void initializeStub() {
@@ -51,10 +42,16 @@ public class SecurityController {
                     .body(new AuthenticationResponse(e.getMessage()));
         }
     }
-    @PostMapping("/confirmation")
+    @GetMapping("/confirmation")
     public ResponseEntity<AuthenticationResponse> confirmReg(
             @RequestParam("token") String confirmationToken){
-        return ResponseEntity.ok(service.confirmRegistration(confirmationToken));
+        try {
+            service.confirmRegistration(confirmationToken);
+            return ResponseEntity.ok(new AuthenticationResponse("activated"));
+        } catch (RuntimeException e){
+            return ResponseEntity.badRequest()
+                    .body(new AuthenticationResponse(e.getMessage()));
+        }
     }
 
     @PostMapping("/auth")

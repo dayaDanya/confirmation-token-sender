@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -15,10 +16,9 @@ import java.util.UUID;
 public class ConfirmationTokenService {
     private final ConfirmationTokenRepo confirmationTokenRepo;
 
-    public Person findPersonByToken(String token){
+    public Optional<Person> findPersonByToken(String token){
         //todo add ex
-        return confirmationTokenRepo.findPersonByToken(token).orElseThrow(() ->
-                new RuntimeException("Confirmation token isn't actual"));
+        return confirmationTokenRepo.findPersonByToken(token);
     }
 
     public ConfirmationToken generateToken(Person person) {
